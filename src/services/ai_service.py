@@ -3,7 +3,7 @@
 """
 import json
 import logging
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 from models.context import Context
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ class AIService:
         logger.debug(f"Анализ контекста сообщения: {text[:50]}...")
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+                model="gpt-4",  # Using standard GPT-4 model
                 messages=[
                     {
                         "role": "system",
@@ -42,11 +42,14 @@ class AIService:
             result = json.loads(response.choices[0].message.content)
             logger.debug(f"Анализ контекста успешно завершен: {result}")
             return result
+        except OpenAIError as e:
+            logger.error(f"Ошибка OpenAI API: {str(e)}", exc_info=True)
+            return {"name": "", "holiday": "", "interests": [], "characteristics": []}
         except json.JSONDecodeError as e:
             logger.error(f"Ошибка при разборе JSON ответа: {str(e)}", exc_info=True)
             return {"name": "", "holiday": "", "interests": [], "characteristics": []}
         except Exception as e:
-            logger.error(f"Ошибка при анализе контекста: {str(e)}", exc_info=True)
+            logger.error(f"Неожиданная ошибка при анализе контекста: {str(e)}", exc_info=True)
             return {"name": "", "holiday": "", "interests": [], "characteristics": []}
 
     async def generate_greeting(self, context: Context) -> str:
@@ -56,11 +59,12 @@ class AIService:
         logger.debug("Начало генерации текста поздравления")
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4",
                 messages=[
                     {
                         "role": "system",
-                        "content": "Создай уникальное поздравление на основе контекста"
+                        "content": """Создай уникальное поздравление на основе контекста.
+                        Используй теплый, дружелюбный тон и учитывай интересы человека."""
                     },
                     {"role": "user", "content": str(context)}
                 ],
@@ -69,9 +73,14 @@ class AIService:
             greeting_text = response.choices[0].message.content
             logger.debug(f"Поздравление успешно сгенерировано: {greeting_text[:50]}...")
             return greeting_text
+        except OpenAIError as e:
+            error_msg = f"Ошибка OpenAI API при генерации поздравления: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            raise Exception(error_msg)
         except Exception as e:
-            logger.error(f"Ошибка при генерации поздравления: {str(e)}", exc_info=True)
-            raise
+            error_msg = f"Неожиданная ошибка при генерации поздравления: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            raise Exception(error_msg)
 
     async def generate_image(self, context: Context) -> str:
         """
@@ -91,6 +100,11 @@ class AIService:
             image_url = response.data[0].url
             logger.debug(f"Изображение успешно сгенерировано: {image_url}")
             return image_url
+        except OpenAIError as e:
+            error_msg = f"Ошибка OpenAI API при генерации изображения: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            raise Exception(error_msg)
         except Exception as e:
-            logger.error(f"Ошибка при генерации изображения: {str(e)}", exc_info=True)
-            raise
+            error_msg = f"Неожиданная ошибка при генерации изображения: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            raise Exception(error_msg)

@@ -1,7 +1,7 @@
 """
 Обработчики команд и сообщений бота
 """
-from aiogram import Dispatcher, types
+from aiogram import types
 from aiogram.filters import Command
 import logging
 from services.context_manager import ContextManager
@@ -30,12 +30,13 @@ async def handle_message(
     content_generator: ContentGenerator
 ):
     """Обработчик текстовых сообщений"""
-    logger.info(
-        f"[DEBUG] ВХОДЯЩЕЕ СООБЩЕНИЕ - От: {message.from_user.id}, "
-        f"Текст: {message.text[:50]}..., "
-        f"Тип: {type(message)}"
-    )
     try:
+        logger.info(
+            f"[DEBUG] ВХОДЯЩЕЕ СООБЩЕНИЕ - От: {message.from_user.id}, "
+            f"Текст: {message.text[:50]}..., "
+            f"Тип: {type(message)}"
+        )
+
         # Нормализация текста сообщения
         message_text = message.text.strip() if message.text else ""
         logger.debug(f"Нормализованный текст сообщения: {message_text}")
@@ -60,15 +61,27 @@ async def handle_message(
             await message.answer("Пожалуйста, отправьте текстовое сообщение")
             return
 
-        # Обновление контекста
-        context = await context_manager.update_context(message.from_user.id, message_text)
-        logger.debug(f"Контекст обновлен для пользователя {message.from_user.id}")
-        logger.debug(f"История сообщений: {context.messages}")
+        # Отправка сообщения о начале обработки
+        processing_msg = await message.answer("Анализирую сообщение...")
 
-        # Отправка резюме контекста
-        summary = context.get_summary()
-        logger.debug(f"Сформировано резюме контекста: {summary}")
-        await message.answer(f"Я запомнил:\n{summary}")
+        try:
+            # Обновление контекста
+            context = await context_manager.update_context(message.from_user.id, message_text)
+            logger.debug(f"Контекст обновлен для пользователя {message.from_user.id}")
+            logger.debug(f"История сообщений: {context.messages}")
+
+            # Удаление сообщения о процессе
+            await processing_msg.delete()
+
+            # Отправка резюме контекста
+            summary = context.get_summary()
+            logger.debug(f"Сформировано резюме контекста: {summary}")
+            await message.answer(f"Я запомнил:\n{summary}")
+
+        except Exception as e:
+            logger.error(f"Ошибка при обработке контекста: {str(e)}", exc_info=True)
+            await processing_msg.edit_text("Произошла ошибка при анализе сообщения. Попробуйте еще раз.")
+
     except Exception as e:
         logger.error(f"Ошибка при обработке сообщения: {str(e)}", exc_info=True)
         await message.answer("Произошла ошибка при обработке сообщения. Попробуйте еще раз.")
@@ -81,30 +94,43 @@ async def generate_congratulation(
     """Обработчик команды /congratulation"""
     logger.info(f"Получена команда /congratulation от пользователя {message.from_user.id}")
 
-    context = context_manager.get_context(message.from_user.id)
-    if not context or not context.messages:
-        logger.warning(f"Контекст не найден для пользователя {message.from_user.id}")
-        await message.answer("Сначала расскажите о том, кого хотите поздравить!")
-        return
-
-    # Генерация поздравления и изображения
     try:
-        logger.debug("Начало генерации поздравления")
-        greeting_text, image_url = await content_generator.generate_content(context)
-        logger.debug(f"Поздравление сгенерировано, URL изображения: {image_url}")
+        context = context_manager.get_context(message.from_user.id)
+        if not context or not context.messages:
+            logger.warning(f"Контекст не найден для пользователя {message.from_user.id}")
+            await message.answer("Сначала расскажите о том, кого хотите поздравить!")
+            return
 
-        # Отправка результата
-        await message.answer_photo(
-            photo=image_url,
-            caption=greeting_text[:1024]  # Ограничение длины caption
-        )
-        logger.info(f"Поздравление успешно отправлено пользователю {message.from_user.id}")
+        # Отправка сообщения о начале генерации
+        processing_msg = await message.answer("Генерирую поздравление...")
 
-        # Очищаем контекст после успешной генерации
-        context_manager.clear_context(message.from_user.id)
-        logger.debug(f"Контекст очищен для пользователя {message.from_user.id}")
+        try:
+            # Генерация поздравления и изображения
+            logger.debug("Начало генерации поздравления")
+            greeting_text, image_url = await content_generator.generate_content(context)
+            logger.debug(f"Поздравление сгенерировано, URL изображения: {image_url}")
+
+            # Удаление сообщения о процессе
+            await processing_msg.delete()
+
+            # Отправка результата
+            await message.answer_photo(
+                photo=image_url,
+                caption=greeting_text[:1024]  # Ограничение длины caption
+            )
+            logger.info(f"Поздравление успешно отправлено пользователю {message.from_user.id}")
+
+            # Очищаем контекст после успешной генерации
+            context_manager.clear_context(message.from_user.id)
+            logger.debug(f"Контекст очищен для пользователя {message.from_user.id}")
+
+        except Exception as e:
+            error_msg = f"Произошла ошибка при генерации поздравления: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            await processing_msg.edit_text(error_msg)
+
     except Exception as e:
-        error_msg = f"Произошла ошибка при генерации поздравления: {str(e)}"
+        error_msg = f"Произошла ошибка при обработке команды: {str(e)}"
         logger.error(error_msg, exc_info=True)
         await message.answer(error_msg)
 
