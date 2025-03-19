@@ -2,6 +2,7 @@
 Инициализация и настройка бота
 """
 import logging
+import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
@@ -54,7 +55,7 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
         
         # Регистрация обработчика с сервисами
         dp.message.register(
-            lambda msg: handle_message(msg, context_manager, content_generator)
+            lambda msg: asyncio.create_task(handle_message(msg, context_manager, content_generator))
         )
         
         logger.debug("Обработчики команд зарегистрированы")
