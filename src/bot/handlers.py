@@ -41,18 +41,21 @@ async def handle_message(
         message_text = message.text.strip() if message.text else ""
         logger.debug(f"Нормализованный текст сообщения: {message_text}")
 
-        # Проверяем, не является ли сообщение командой кнопки
-        if message_text == "✨ Создать поздравление":
-            logger.debug("Обработка команды 'Создать поздравление'")
-            await generate_congratulation(message, context_manager, content_generator)
-            return
-        elif message_text == "❓ Помощь":
-            logger.debug("Обработка команды 'Помощь'")
-            await help_command(message)
-            return
-        elif message_text == "🔄 Перезагрузить бота":
-            logger.debug("Обработка команды 'Перезагрузить бота'")
-            await start_command(message)
+        # Определяем команды кнопок
+        BUTTON_COMMANDS = {
+            "✨ Создать поздравление": generate_congratulation,
+            "❓ Помощь": help_command,
+            "🔄 Перезагрузить бота": start_command
+        }
+
+        # Если это команда кнопки, выполняем её без анализа контекста
+        if message_text in BUTTON_COMMANDS:
+            logger.debug(f"Обработка команды кнопки: {message_text}")
+            command_handler = BUTTON_COMMANDS[message_text]
+            if command_handler == generate_congratulation:
+                await command_handler(message, context_manager, content_generator)
+            else:
+                await command_handler(message)
             return
 
         # Проверка на пустое сообщение
