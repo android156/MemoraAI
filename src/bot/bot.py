@@ -5,6 +5,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
+from aiogram.filters import Command
 from aiogram.client.default import DefaultBotProperties
 from config import Config
 from bot.handlers import handle_message, start_command, help_command
