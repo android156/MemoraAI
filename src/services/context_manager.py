@@ -52,14 +52,18 @@ class ContextManager:
             logger.debug(f"Результат анализа контекста: {analyzed_data}")
 
             # Обновление контекста на основе анализа
-            if "name" in analyzed_data and analyzed_data["name"]:
+            if "name" in analyzed_data and analyzed_data["name"] and analyzed_data["name"] != "Не указано":
                 context.name = analyzed_data["name"]
-            if "holiday" in analyzed_data and analyzed_data["holiday"]:
+            if "holiday" in analyzed_data and analyzed_data["holiday"] and analyzed_data["holiday"] != "Не указан":
                 context.holiday = analyzed_data["holiday"]
             if "interests" in analyzed_data and analyzed_data["interests"]:
-                context.interests.extend(analyzed_data["interests"])
+                for interest in analyzed_data["interests"]:
+                    if interest not in context.interests:
+                        context.interests.append(interest)
             if "characteristics" in analyzed_data and analyzed_data["characteristics"]:
-                context.characteristics.extend(analyzed_data["characteristics"])
+                for char in analyzed_data["characteristics"]:
+                    if char not in context.characteristics:
+                        context.characteristics.append(char)
 
             # Добавление исходного сообщения в историю
             context.add_message(message)
