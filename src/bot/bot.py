@@ -63,7 +63,7 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
         async def dependencies_middleware(handler, event, data):
             # Get handler's parameters
             from inspect import signature
-            handler_params = signature(handler.callback).parameters
+            handler_params = signature(handler).parameters
             
             # Only pass dependencies that the handler expects
             filtered_data = {}
