@@ -54,8 +54,8 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
         dp.message.register(handle_message)
         
         # Регистрация middleware
-        dp.message.outer_middleware(context_manager)
-        dp.message.outer_middleware(content_generator)
+        dp.update.outer_middleware(context_manager)
+        dp.update.outer_middleware(content_generator)
         logger.debug("Обработчики команд зарегистрированы")
     except Exception as e:
         logger.error(f"Ошибка при регистрации обработчиков: {str(e)}", exc_info=True)
