@@ -1,0 +1,69 @@
+"""
+Инициализация и настройка бота
+"""
+import logging
+from aiogram import Bot, Dispatcher
+from aiogram.enums import ParseMode
+from aiogram.types import BotCommand
+from aiogram.client.default import DefaultBotProperties
+from config import Config
+from bot.handlers import register_handlers
+from services.ai_service import AIService
+from services.context_manager import ContextManager
+from services.content_generator import ContentGenerator
+
+logger = logging.getLogger(__name__)
+
+async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
+    """
+    Создание и настройка экземпляра бота
+
+    Returns:
+        tuple[Bot, Dispatcher]: Кортеж из объектов бота и диспетчера
+    """
+    logger.info("Начало инициализации бота")
+
+    # Создание бота с правильными настройками HTML-разметки
+    bot = Bot(
+        token=config.telegram_token,
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+    )
+    logger.debug("Бот создан с настройками HTML-разметки")
+
+    # Создание диспетчера
+    dp = Dispatcher()
+    logger.debug("Диспетчер создан")
+
+    # Инициализация сервисов
+    try:
+        logger.info("Инициализация сервисов")
+        ai_service = AIService(config.openai_api_key)
+        context_manager = ContextManager()
+        content_generator = ContentGenerator(ai_service)
+        logger.debug("Сервисы успешно инициализированы")
+    except Exception as e:
+        logger.error(f"Ошибка при инициализации сервисов: {str(e)}", exc_info=True)
+        raise
+
+    # Регистрация обработчиков
+    try:
+        register_handlers(dp, context_manager, content_generator)
+        logger.debug("Обработчики команд зарегистрированы")
+    except Exception as e:
+        logger.error(f"Ошибка при регистрации обработчиков: {str(e)}", exc_info=True)
+        raise
+
+    # Установка команд бота с использованием правильного формата BotCommand
+    try:
+        await bot.set_my_commands([
+            BotCommand(command="start", description="Перезагрузить бота"),
+            BotCommand(command="help", description="Помощь"),
+            BotCommand(command="congratulation", description="Создать поздравление")
+        ])
+        logger.debug("Команды бота установлены")
+    except Exception as e:
+        logger.error(f"Ошибка при установке команд бота: {str(e)}", exc_info=True)
+        raise
+
+    logger.info("Инициализация бота завершена успешно")
+    return bot, dp
