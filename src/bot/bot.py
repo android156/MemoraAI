@@ -5,7 +5,7 @@ import logging
 import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from aiogram.types import BotCommand
+from aiogram.types import BotCommand, Message as types
 from aiogram.filters import Command
 from aiogram.client.default import DefaultBotProperties
 from config import Config
@@ -61,13 +61,11 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
 
         # Внедрение зависимостей для обработчика
         async def dependencies_middleware(handler, event, data):
-            kwargs = {}
-            if 'context_manager' in handler.__code__.co_varnames:
-                kwargs['context_manager'] = context_manager
-            if 'content_generator' in handler.__code__.co_varnames:
-                kwargs['content_generator'] = content_generator
-            
-            return await handler(event, **kwargs)
+            # Просто добавляем зависимости в существующие данные
+            data['context_manager'] = context_manager
+            data['content_generator'] = content_generator
+            # Вызываем handler как есть
+            return await handler(event, **data)
 
         dp.message.middleware.register(dependencies_middleware)
 
