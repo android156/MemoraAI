@@ -23,7 +23,7 @@ class AIService:
         logger.debug(f"Анализ контекста сообщения: {text[:50]}...")
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4",  # Using standard GPT-4 model
+                model="gpt-4o",  # Using standard GPT-4 model
                 messages=[
                     {
                         "role": "system",
@@ -59,7 +59,7 @@ class AIService:
         logger.debug("Начало генерации текста поздравления")
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o",
                 messages=[
                     {
                         "role": "system",
