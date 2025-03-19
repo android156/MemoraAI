@@ -55,7 +55,7 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
         
         # Регистрация обработчика с сервисами
         dp.message.register(
-            lambda msg: asyncio.create_task(handle_message(msg, context_manager, content_generator))
+            lambda msg: handle_message(msg, context_manager, content_generator)
         )
         
         logger.debug("Обработчики команд зарегистрированы")
