@@ -59,7 +59,7 @@ async def handle_message(
             return
 
         # Обновление контекста
-        context = context_manager.update_context(message.from_user.id, message_text)
+        context = await context_manager.update_context(message.from_user.id, message_text)
         logger.debug(f"Контекст обновлен для пользователя {message.from_user.id}")
         logger.debug(f"История сообщений: {context.messages}")
 

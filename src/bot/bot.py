@@ -38,7 +38,7 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
     try:
         logger.info("Инициализация сервисов")
         ai_service = AIService(config.openai_api_key)
-        context_manager = ContextManager()
+        context_manager = ContextManager(ai_service)
         content_generator = ContentGenerator(ai_service)
         logger.debug("Сервисы успешно инициализированы")
     except Exception as e:
