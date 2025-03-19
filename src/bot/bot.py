@@ -60,9 +60,15 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
         )
 
         # Внедрение зависимостей для обработчика
-        dp.message.middleware.register(lambda handler, event, data: 
-            handler(event, context_manager, content_generator, **data)
-        )
+        async def dependencies_middleware(handler, event, data):
+            # Убираем dispatcher из data чтобы избежать конфликта
+            data.pop('dispatcher', None)
+            # Добавляем наши зависимости
+            data['context_manager'] = context_manager
+            data['content_generator'] = content_generator
+            return await handler(event, **data)
+            
+        dp.message.middleware.register(dependencies_middleware)
         
         logger.debug("Обработчики команд зарегистрированы")
     except Exception as e:
