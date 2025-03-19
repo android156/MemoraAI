@@ -7,7 +7,7 @@ from aiogram.enums import ParseMode
 from aiogram.types import BotCommand
 from aiogram.client.default import DefaultBotProperties
 from config import Config
-from bot.handlers import register_handlers
+from bot.handlers import handle_message, start_command, help_command
 from services.ai_service import AIService
 from services.context_manager import ContextManager
 from services.content_generator import ContentGenerator
@@ -49,6 +49,8 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
     try:
         dp.message.middleware(context_manager)
         dp.message.middleware(content_generator)
+        dp.message.register(start_command, Command("start"))
+        dp.message.register(help_command, Command("help"))
         dp.message.register(handle_message)
         logger.debug("Обработчики команд зарегистрированы")
     except Exception as e:
