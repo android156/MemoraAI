@@ -61,18 +61,13 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
 
         # Внедрение зависимостей для обработчика
         async def dependencies_middleware(handler, event, data):
-            # Get handler's parameters
-            from inspect import signature
-            handler_params = signature(handler).parameters
+            kwargs = {}
+            if 'context_manager' in handler.__code__.co_varnames:
+                kwargs['context_manager'] = context_manager
+            if 'content_generator' in handler.__code__.co_varnames:
+                kwargs['content_generator'] = content_generator
             
-            # Prepare data with our dependencies
-            merged_data = dict(data)
-            if 'context_manager' in handler_params:
-                merged_data['context_manager'] = context_manager
-            if 'content_generator' in handler_params:
-                merged_data['content_generator'] = content_generator
-                
-            return await handler(event, data=merged_data)
+            return await handler(event, **kwargs)
 
         dp.message.middleware.register(dependencies_middleware)
 
