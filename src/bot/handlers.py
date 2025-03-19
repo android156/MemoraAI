@@ -24,7 +24,6 @@ async def help_command(message: types.Message):
     logger.info(f"Получена команда /help от пользователя {message.from_user.id}")
     await message.answer(HELP_MESSAGE, reply_markup=get_main_keyboard())
 
-@dp.message()
 async def handle_message(
     message: types.Message,
     context_manager: ContextManager,
