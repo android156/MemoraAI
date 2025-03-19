@@ -61,12 +61,18 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
 
         # Внедрение зависимостей для обработчика
         async def dependencies_middleware(handler, event, data):
-            # Remove unnecessary arguments
-            data = {
-                "context_manager": context_manager,
-                "content_generator": content_generator
-            }
-            return await handler(event, **data)
+            # Get handler's parameters
+            from inspect import signature
+            handler_params = signature(handler.callback).parameters
+            
+            # Only pass dependencies that the handler expects
+            filtered_data = {}
+            if 'context_manager' in handler_params:
+                filtered_data['context_manager'] = context_manager
+            if 'content_generator' in handler_params:
+                filtered_data['content_generator'] = content_generator
+                
+            return await handler(event, **filtered_data)
 
         dp.message.middleware.register(dependencies_middleware)
 
