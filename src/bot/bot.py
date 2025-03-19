@@ -5,7 +5,7 @@ import logging
 import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from aiogram.types import BotCommand, Message as types
+from aiogram.types import BotCommand, Message
 from aiogram.filters import Command
 from aiogram.client.session.base import BaseSession
 from config import Config
@@ -55,7 +55,7 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
 
         # Регистрация обработчика сообщений
         @dp.message(lambda msg: not msg.text.startswith('/'))
-        async def message_handler(message: types.Message, context_manager=context_manager, content_generator=content_generator):
+        async def message_handler(message: Message, context_manager=context_manager, content_generator=content_generator):
             return await handle_message(message, context_manager, content_generator)
 
         logger.debug("Обработчики команд зарегистрированы")
