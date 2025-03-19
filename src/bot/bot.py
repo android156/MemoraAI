@@ -52,6 +52,11 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
         # Регистрация обычных команд без middleware
         dp.message.register(start_command, Command(commands=["start"]))
         dp.message.register(help_command, Command(commands=["help"]))
+        dp.message.register(
+            lambda msg, context_manager=context_manager, content_generator=content_generator: 
+            generate_congratulation(msg, context_manager, content_generator),
+            Command(commands=["congratulation"])
+        )
 
         # Регистрация обработчика сообщений
         @dp.message(lambda msg: not msg.text.startswith('/'))
