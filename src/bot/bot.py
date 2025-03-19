@@ -7,7 +7,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand, Message as types
 from aiogram.filters import Command
-from aiogram.client.default import DefaultBotProperties
+from aiogram.client.session.base import BaseSession
 from config import Config
 from bot.handlers import handle_message, start_command, help_command
 from services.ai_service import AIService
@@ -28,7 +28,7 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
     # Создание бота с правильными настройками HTML-разметки
     bot = Bot(
         token=config.telegram_token,
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+        parse_mode=ParseMode.HTMLHTML)
     )
     logger.debug("Бот создан с настройками HTML-разметки")
 
