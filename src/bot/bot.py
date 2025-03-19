@@ -52,7 +52,7 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
         # Регистрация обработчиков
         dp.message.register(start_command, Command("start"))
         dp.message.register(help_command, Command("help"))
-        
+
         # Регистрация обработчика с сервисами
         dp.message.register(
             handle_message,
@@ -61,15 +61,12 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
 
         # Внедрение зависимостей для обработчика
         async def dependencies_middleware(handler, event, data):
-            # Вызываем handler с базовыми параметрами
-            return await handler(
-                event,
-                context_manager,
-                content_generator
-            )
-            
+            data["context_manager"] = context_manager
+            data["content_generator"] = content_generator
+            return await handler(event, **data)
+
         dp.message.middleware.register(dependencies_middleware)
-        
+
         logger.debug("Обработчики команд зарегистрированы")
     except Exception as e:
         logger.error(f"Ошибка при регистрации обработчиков: {str(e)}", exc_info=True)
