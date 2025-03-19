@@ -61,12 +61,12 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
 
         # Внедрение зависимостей для обработчика
         async def dependencies_middleware(handler, event, data):
-            # Убираем dispatcher из data чтобы избежать конфликта
-            data.pop('dispatcher', None)
-            # Добавляем наши зависимости
-            data['context_manager'] = context_manager
-            data['content_generator'] = content_generator
-            return await handler(event, **data)
+            # Вызываем handler только с нужными параметрами
+            return await handler(
+                event,
+                context_manager=context_manager,
+                content_generator=content_generator
+            )
             
         dp.message.middleware.register(dependencies_middleware)
         
