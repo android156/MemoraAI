@@ -34,8 +34,34 @@ async def handle_message(
         f"Получено сообщение от пользователя {message.from_user.id}: {message.text[:50]}..."
     )
     try:
+        # Нормализация текста сообщения
+        message_text = message.text.strip() if message.text else ""
+        logger.debug(f"Нормализованный текст сообщения: {message_text}")
+
+        # Проверяем, не является ли сообщение командой кнопки
+        if message_text == "✨ Создать поздравление":
+            logger.debug("Обработка команды 'Создать поздравление'")
+            await generate_congratulation(message, context_manager, content_generator)
+            return
+        elif message_text == "❓ Помощь":
+            logger.debug("Обработка команды 'Помощь'")
+            await help_command(message)
+            return
+        elif message_text == "🔄 Перезагрузить бота":
+            logger.debug("Обработка команды 'Перезагрузить бота'")
+            await start_command(message)
+            return
+
+        # Проверка на пустое сообщение
+        if not message_text:
+            logger.warning("Получено пустое сообщение")
+            await message.answer("Пожалуйста, отправьте текстовое сообщение")
+            return
+
         # Обновление контекста
-        context = context_manager.update_context(message.from_user.id, message.text)
+        context = context_manager.update_context(message.from_user.id, message_text)
+        logger.debug(f"Контекст обновлен для пользователя {message.from_user.id}")
+        logger.debug(f"История сообщений: {context.messages}")
 
         # Отправка резюме контекста
         summary = context.get_summary()
@@ -54,7 +80,7 @@ async def generate_congratulation(
     logger.info(f"Получена команда /congratulation от пользователя {message.from_user.id}")
 
     context = context_manager.get_context(message.from_user.id)
-    if not context:
+    if not context or not context.messages:
         logger.warning(f"Контекст не найден для пользователя {message.from_user.id}")
         await message.answer("Сначала расскажите о том, кого хотите поздравить!")
         return
@@ -71,6 +97,10 @@ async def generate_congratulation(
             caption=greeting_text[:1024]  # Ограничение длины caption
         )
         logger.info(f"Поздравление успешно отправлено пользователю {message.from_user.id}")
+
+        # Очищаем контекст после успешной генерации
+        context_manager.clear_context(message.from_user.id)
+        logger.debug(f"Контекст очищен для пользователя {message.from_user.id}")
     except Exception as e:
         error_msg = f"Произошла ошибка при генерации поздравления: {str(e)}"
         logger.error(error_msg, exc_info=True)
@@ -86,9 +116,10 @@ def register_handlers(
     dp.message.register(start_command, Command(commands=["start"]))
     dp.message.register(help_command, Command(commands=["help"]))
     dp.message.register(
-        generate_congratulation,
+        lambda message: generate_congratulation(message, context_manager, content_generator),
         Command(commands=["congratulation"])
     )
+    # Регистрируем обработчик для всех остальных сообщений
     dp.message.register(
-        lambda msg: handle_message(msg, context_manager, content_generator)
+        lambda message: handle_message(message, context_manager, content_generator)
     )
