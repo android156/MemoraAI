@@ -61,9 +61,11 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
 
         # Внедрение зависимостей для обработчика
         async def dependencies_middleware(handler, event, data):
-            # Remove 'dispatcher' from data if present to avoid unexpected keyword argument error
+            # Remove 'dispatcher' and 'bots' from data to avoid unexpected keyword argument error
             if 'dispatcher' in data:
                 del data['dispatcher']
+            if 'bots' in data:
+                del data['bots']
             data["context_manager"] = context_manager
             data["content_generator"] = content_generator
             return await handler(event, **data)
