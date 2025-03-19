@@ -47,6 +47,7 @@ async def main():
 
 if __name__ == '__main__':
     try:
+        logger.info("Запуск приложения бота")
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logger.info("Бот остановлен")

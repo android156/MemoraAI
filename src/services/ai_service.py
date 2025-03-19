@@ -1,6 +1,7 @@
 """
 Сервис для работы с OpenAI API
 """
+import json
 import logging
 from openai import OpenAI
 from models.context import Context
@@ -26,17 +27,27 @@ class AIService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "Проанализируй текст и выдели ключевую информацию о человеке и празднике"
+                        "content": """Проанализируй текст и верни JSON с информацией в следующем формате:
+                        {
+                            "name": "имя человека",
+                            "holiday": "название праздника",
+                            "interests": ["интерес1", "интерес2"],
+                            "characteristics": ["характеристика1", "характеристика2"]
+                        }"""
                     },
                     {"role": "user", "content": text}
                 ],
                 response_format={"type": "json_object"}
             )
-            logger.debug("Анализ контекста успешно завершен")
-            return response.choices[0].message.content
+            result = json.loads(response.choices[0].message.content)
+            logger.debug(f"Анализ контекста успешно завершен: {result}")
+            return result
+        except json.JSONDecodeError as e:
+            logger.error(f"Ошибка при разборе JSON ответа: {str(e)}", exc_info=True)
+            return {"name": "", "holiday": "", "interests": [], "characteristics": []}
         except Exception as e:
             logger.error(f"Ошибка при анализе контекста: {str(e)}", exc_info=True)
-            raise
+            return {"name": "", "holiday": "", "interests": [], "characteristics": []}
 
     async def generate_greeting(self, context: Context) -> str:
         """

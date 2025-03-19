@@ -31,7 +31,9 @@ async def handle_message(
 ):
     """Обработчик текстовых сообщений"""
     logger.info(
-        f"Получено сообщение от пользователя {message.from_user.id}: {message.text[:50]}..."
+        f"[DEBUG] ВХОДЯЩЕЕ СООБЩЕНИЕ - От: {message.from_user.id}, "
+        f"Текст: {message.text[:50]}..., "
+        f"Тип: {type(message)}"
     )
     try:
         # Нормализация текста сообщения
