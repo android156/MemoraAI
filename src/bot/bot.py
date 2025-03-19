@@ -65,14 +65,14 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
             from inspect import signature
             handler_params = signature(handler).parameters
             
-            # Only pass dependencies that the handler expects
-            filtered_data = {}
+            # Prepare data with our dependencies
+            merged_data = dict(data)
             if 'context_manager' in handler_params:
-                filtered_data['context_manager'] = context_manager
+                merged_data['context_manager'] = context_manager
             if 'content_generator' in handler_params:
-                filtered_data['content_generator'] = content_generator
+                merged_data['content_generator'] = content_generator
                 
-            return await handler(event, **filtered_data)
+            return await handler(event, data=merged_data)
 
         dp.message.middleware.register(dependencies_middleware)
 
