@@ -55,7 +55,10 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
         
         # Регистрация обработчика с сервисами
         dp.message.register(
-            lambda msg: handle_message(msg, context_manager, content_generator)
+            lambda msg: asyncio.run_coroutine_threadsafe(
+                handle_message(msg, context_manager, content_generator),
+                asyncio.get_event_loop()
+            )
         )
         
         logger.debug("Обработчики команд зарегистрированы")
