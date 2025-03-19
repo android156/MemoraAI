@@ -49,25 +49,14 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
 
     # Регистрация обработчиков
     try:
-        # Регистрация обработчиков
-        dp.message.register(start_command, Command("start"))
-        dp.message.register(help_command, Command("help"))
+        # Регистрация обычных команд без middleware
+        dp.message.register(start_command, Command(commands=["start"]))
+        dp.message.register(help_command, Command(commands=["help"]))
 
-        # Регистрация обработчика с сервисами
-        dp.message.register(
-            handle_message,
-            lambda msg: not msg.text.startswith('/')
-        )
-
-        # Внедрение зависимостей для обработчика
-        async def dependencies_middleware(handler, event, data):
-            # Просто добавляем зависимости в существующие данные
-            data['context_manager'] = context_manager
-            data['content_generator'] = content_generator
-            # Вызываем handler как есть
-            return await handler(event, **data)
-
-        dp.message.middleware.register(dependencies_middleware)
+        # Регистрация обработчика сообщений
+        @dp.message(lambda msg: not msg.text.startswith('/'))
+        async def message_handler(message: types.Message, context_manager=context_manager, content_generator=content_generator):
+            return await handle_message(message, context_manager, content_generator)
 
         logger.debug("Обработчики команд зарегистрированы")
     except Exception as e:
