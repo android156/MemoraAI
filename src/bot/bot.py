@@ -28,7 +28,7 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
     # Создание бота с правильными настройками HTML-разметки
     bot = Bot(
         token=config.telegram_token,
-        parse_mode=ParseMode.HTMLHTML)
+        parse_mode=ParseMode.HTML
     )
     logger.debug("Бот создан с настройками HTML-разметки")
 
