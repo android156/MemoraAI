@@ -1,7 +1,7 @@
 """
 Обработчики команд и сообщений бота
 """
-from aiogram import types
+from aiogram import types, Dispatcher
 from aiogram.filters import Command
 import logging
 from services.context_manager import ContextManager
