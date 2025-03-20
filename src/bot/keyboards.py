@@ -9,10 +9,13 @@ def get_main_keyboard() -> ReplyKeyboardMarkup:
     """
     keyboard = [
         [
-            KeyboardButton(text="✨ Создать поздравление"),
+            KeyboardButton(text="✨ Поздравление"),
             KeyboardButton(text="❓ Помощь")
         ],
-        [KeyboardButton(text="🔄 Перезагрузить бота")]
+        [
+            KeyboardButton(text="❌ Очистить контекст"), 
+            KeyboardButton(text="🔄 Перезагрузить")
+        ]
     ]
     return ReplyKeyboardMarkup(
         keyboard=keyboard,

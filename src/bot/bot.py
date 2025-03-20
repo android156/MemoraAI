@@ -9,7 +9,7 @@ from aiogram.types import BotCommand, Message
 from aiogram.filters import Command
 from aiogram.client.session.base import BaseSession
 from config import Config
-from bot.handlers import handle_message, start_command, help_command
+from bot.handlers import handle_message, start_command, help_command, clear_command
 from services.ai_service import AIService
 from services.context_manager import ContextManager
 from services.content_generator import ContentGenerator
@@ -52,6 +52,7 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
         # Регистрация обычных команд без middleware
         dp.message.register(start_command, Command(commands=["start"]))
         dp.message.register(help_command, Command(commands=["help"]))
+        dp.message.register(clear_command, Command(commands=["clear"]))
         dp.message.register(
             lambda msg, context_manager=context_manager, content_generator=content_generator: 
             generate_congratulation(msg, context_manager, content_generator),
@@ -73,7 +74,8 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
         await bot.set_my_commands([
             BotCommand(command="start", description="Перезагрузить бота"),
             BotCommand(command="help", description="Помощь"),
-            BotCommand(command="congratulation", description="Создать поздравление")
+            BotCommand(command="congratulation", description="Создать поздравление"),
+            BotCommand(command="clear", description="Очистить контекст")
         ])
         logger.debug("Команды бота установлены")
     except Exception as e:

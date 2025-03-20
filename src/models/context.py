@@ -11,9 +11,10 @@ logger = logging.getLogger(__name__)
 class Context:
     """Класс для хранения контекста диалога"""
     name: str = ""
+    aliases: List[str] = field(default_factory=list)
     holiday: str = ""
     interests: List[str] = field(default_factory=list)
-    characteristics: List[str] = field(default_factory=list)
+    important_detailes: List[str] = field(default_factory=list)
     messages: List[str] = field(default_factory=list)
 
     def add_message(self, message: str):
@@ -43,6 +44,13 @@ class Context:
             summary.append(f"Поздравляем: **{self.name}**")
             logger.debug(f"Добавлено имя: {self.name}")
 
+        if self.aliases:
+            summary.append("Обращения:")
+            for alias in self.aliases:
+                summary.append(f"- **{alias}**")
+            logger.debug(f"Добавлены обращения: {', '.join(self.interests)}")
+        
+
         if self.holiday:
             summary.append(f"Праздник: **{self.holiday}**")
             logger.debug(f"Добавлен праздник: {self.holiday}")
@@ -53,11 +61,11 @@ class Context:
                 summary.append(f"- **{interest}**")
             logger.debug(f"Добавлены интересы: {', '.join(self.interests)}")
 
-        if self.characteristics:
-            summary.append("Особенности:")
-            for char in self.characteristics:
-                summary.append(f"- **{char}**")
-            logger.debug(f"Добавлены характеристики: {', '.join(self.characteristics)}")
+        if self.important_detailes:
+            summary.append("Важные уточнения:")
+            for detail in self.important_detailes:
+                summary.append(f"- **{detail}**")
+            logger.debug(f"Добавлены важные уточнения: {', '.join(self.important_detailes)}")
 
         result = "\n".join(summary) if summary else "Контекст пока пуст"
         logger.debug(f"Сформировано резюме: {result}")
@@ -66,3 +74,8 @@ class Context:
     def __str__(self) -> str:
         """Строковое представление контекста"""
         return self.get_summary()
+
+    def clear(self):
+        """Очистка контекста"""
+        logger.debug("Очистка контекста")
+        self = Context()

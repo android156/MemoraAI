@@ -24,6 +24,14 @@ async def help_command(message: types.Message):
     logger.info(f"Получена команда /help от пользователя {message.from_user.id}")
     await message.answer(HELP_MESSAGE, reply_markup=get_main_keyboard())
 
+async def clear_command(message: types.Message):
+    """Обработчик команды /clear"""
+    logger.info(f"Получена команда /clear от пользователя {message.from_user.id}")
+    context_manager = ContextManager()
+    context_manager.clear_context(message.from_user.id)
+    await message.answer("Контекст очищен", reply_markup=get_main_keyboard())
+
+
 async def handle_message(
     message: types.Message,
     context_manager: ContextManager,

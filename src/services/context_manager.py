@@ -45,25 +45,11 @@ class ContextManager:
             self._contexts[user_id] = Context()
 
         context = self._contexts[user_id]
-
+        
         # Анализ сообщения с помощью ИИ
         try:
-            analyzed_data = await self.ai_service.analyze_context(message)
+            analyzed_data = await self.ai_service.analyze_context(message, context)
             logger.debug(f"Результат анализа контекста: {analyzed_data}")
-
-            # Обновление контекста на основе анализа
-            if "name" in analyzed_data and analyzed_data["name"] and analyzed_data["name"] != "Не указано":
-                context.name = analyzed_data["name"]
-            if "holiday" in analyzed_data and analyzed_data["holiday"] and analyzed_data["holiday"] != "Не указан":
-                context.holiday = analyzed_data["holiday"]
-            if "interests" in analyzed_data and analyzed_data["interests"]:
-                for interest in analyzed_data["interests"]:
-                    if interest not in context.interests:
-                        context.interests.append(interest)
-            if "characteristics" in analyzed_data and analyzed_data["characteristics"]:
-                for char in analyzed_data["characteristics"]:
-                    if char not in context.characteristics:
-                        context.characteristics.append(char)
 
             # Добавление исходного сообщения в историю
             context.add_message(message)
