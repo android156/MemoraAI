@@ -1,4 +1,3 @@
-
 """
 Обработчики команд и сообщений бота
 """
@@ -44,7 +43,7 @@ async def generate_congratulation(
     try:
         user_id = message.from_user.id
         logger.info(f"Генерация поздравления для пользователя {user_id}")
-        
+
         context = context_manager.get_context(user_id)
         if not context or not context.messages:
             await message.answer(
@@ -55,7 +54,7 @@ async def generate_congratulation(
 
         await message.answer("Генерирую поздравление...")
         greeting = await content_generator.generate_congratulation(context)
-        
+
         await message.answer(
             greeting,
             reply_markup=get_main_keyboard()
@@ -105,28 +104,26 @@ async def handle_message(
 def register_handlers(dp: Dispatcher, context_manager: ContextManager, content_generator: ContentGenerator):
     """Регистрация обработчиков команд бота"""
     logger.info("Регистрация обработчиков команд бота")
-    
-    # Регистрация обработчиков команд
+
+    # Регистрация команд с фильтрами для текста кнопок
     dp.message.register(start_command, Command(commands=["start"]))
+    dp.message.register(start_command, F.text == "🔄 Перезагрузить бота")
+
     dp.message.register(help_command, Command(commands=["help"]))
+    dp.message.register(help_command, F.text == "❓ Помощь")
+
     dp.message.register(
-        lambda msg: clear_command(msg, context_manager),
-        Command(commands=["clear"])
+        lambda message: clear_command(message, context_manager),
+        F.text == "🗑 Очистить контекст"
     )
 
-    # Регистрация обработчиков текстовых команд от кнопок
-    dp.message.register(start_command, F.text == "🔄 Перезагрузить")
-    dp.message.register(help_command, F.text == "❓ Помощь")
     dp.message.register(
-        lambda msg: clear_command(msg, context_manager),
-        F.text == "❌ Очистить контекст"
-    )
-    dp.message.register(
-        lambda msg: generate_congratulation(msg, context_manager, content_generator),
+        lambda message: generate_congratulation(message, context_manager, content_generator),
         F.text == "✨ Создать поздравление"
     )
 
-    # Регистрация обработчика для всех остальных сообщений
+    # Общий обработчик для остальных сообщений
     dp.message.register(
-        lambda msg: handle_message(msg, context_manager, content_generator)
+        lambda message: handle_message(message, context_manager, content_generator),
+        flags={'allow_in_transaction': True}
     )
