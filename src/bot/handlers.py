@@ -121,10 +121,19 @@ def register_handlers(dp: Dispatcher, context_manager: ContextManager, content_g
     dp.message.register(clear_handler, Command(commands=["clear"]))
     dp.message.register(clear_handler, F.text == "❌ Очистить контекст")
 
+    # Создаем асинхронный обработчик для генерации поздравления
+    async def generate_handler(message: types.Message):
+        await generate_congratulation(message, context_manager, content_generator)
+
     # Регистрация генерации поздравления
-    dp.message.register(
-        lambda message: generate_congratulation(message, context_manager, content_generator),
-        F.text == "✨ Создать поздравление"
+    dp.message.register(generate_handler, F.text == "✨ Создать поздравление")
+
+    # Регистрация общего обработчика сообщений
+    async def message_handler(message: types.Message):
+        await handle_message(message, context_manager, content_generator)
+
+    # Регистрируем общий обработчик последним
+    dp.message.register(message_handler)
     )
 
     # Общий обработчик для остальных сообщений
