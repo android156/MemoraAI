@@ -134,7 +134,7 @@ def register_handlers(dp: Dispatcher, context_manager: ContextManager, content_g
 
     # Регистрируем общий обработчик последним
     dp.message.register(message_handler)
-    )
+    
 
     # Общий обработчик для остальных сообщений
     dp.message.register(
