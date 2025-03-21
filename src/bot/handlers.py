@@ -53,7 +53,7 @@ async def handle_message(
         message_text = message.text.strip() if message.text else ""
         logger.debug(f"Нормализованный текст сообщения: {message_text}")
 
-        # Определяем команды кнопок
+        # Определяем команды кнопок и сразу проверяем их
         BUTTON_COMMANDS = {
             "✨ Создать поздравление": generate_congratulation,
             "❓ Помощь": help_command,
@@ -61,10 +61,17 @@ async def handle_message(
             "🔄 Перезагрузить бота": start_command
         }
 
-        # Если это команда кнопки, выполняем её без анализа контекста
+        # Если это команда кнопки, немедленно выполняем её и возвращаемся
         if message_text in BUTTON_COMMANDS:
             logger.debug(f"Обработка команды кнопки: {message_text}")
             command_handler = BUTTON_COMMANDS[message_text]
+            if command_handler == generate_congratulation:
+                await command_handler(message, context_manager, content_generator)
+            else:
+                await command_handler(message)
+            return
+
+        # Если не команда кнопки, продолжаем обработку как обычного сообщения
             if command_handler == generate_congratulation:
                 await command_handler(message, context_manager, content_generator)
             else:
