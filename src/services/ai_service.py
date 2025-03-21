@@ -36,7 +36,7 @@ class AIService:
             
         ]
         if prev_context:
-            messages.append({"role": "user", "content": prev_context})
+            messages.append({"role": "user", "content": prev_context.get_summary()})
         messages.append({"role": "user", "content": text})
         try:
             response = self.client.chat.completions.create(
