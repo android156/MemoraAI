@@ -17,6 +17,12 @@ logging.basicConfig(
     level=logging.DEBUG,  # Временно установим уровень DEBUG для отладки
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
+
+# Установка уровня INFO для конкретных логгеров
+logging.getLogger('httpcore.http11').setLevel(logging.INFO)
+logging.getLogger('httpcore.connection').setLevel(logging.INFO)
+logging.getLogger('openai._base_client').setLevel(logging.INFO)
+
 logger = logging.getLogger(__name__)
 
 async def main():
