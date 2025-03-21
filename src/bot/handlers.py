@@ -1,6 +1,7 @@
 """
 Обработчики команд и сообщений бота
 """
+import asyncio
 from aiogram import types, Dispatcher
 from aiogram.filters import Command
 import logging

@@ -2,7 +2,6 @@
 Инициализация и настройка бота
 """
 import logging
-import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand, Message
