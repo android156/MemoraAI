@@ -19,16 +19,19 @@ async def start_command(message: types.Message):
         reply_markup=get_main_keyboard()
     )
 
+
 async def help_command(message: types.Message):
     """Обработчик команды /help"""
     logger.info(f"Получена команда /help от пользователя {message.from_user.id}")
     await message.answer(HELP_MESSAGE, reply_markup=get_main_keyboard())
 
+
 async def clear_command(message: types.Message):
     """Обработчик команды /clear"""
-    logger.info(f"Получена команда /clear от пользователя {message.from_user.id}")
+    user.id = message.from_user.id
+    logger.info(f"Получена команда /clear от пользователя {user.id}")
     context_manager = ContextManager()
-    context_manager.clear_context(message.from_user.id)
+    context_manager.clear_context(user.id)
     await message.answer("Контекст очищен", reply_markup=get_main_keyboard())
 
 
@@ -53,6 +56,7 @@ async def handle_message(
         BUTTON_COMMANDS = {
             "✨ Создать поздравление": generate_congratulation,
             "❓ Помощь": help_command,
+            "❌ Очистить контекст": clear_command,
             "🔄 Перезагрузить бота": start_command
         }
 
@@ -152,8 +156,9 @@ def register_handlers(
 ):
     """Регистрация обработчиков команд и сообщений"""
     logger.info("Регистрация обработчиков команд бота")
-    dp.message.register(start_command, Command(commands=["start"]))
-    dp.message.register(help_command, Command(commands=["help"]))
+    dp.message.register(start_command, Command(commands=["/start"]))
+    dp.message.register(help_command, Command(commands=["/help"]))
+    dp.message.register(clear_command, Command(commands=["/clear"]))
     dp.message.register(
         lambda message: generate_congratulation(message, context_manager, content_generator),
         Command(commands=["congratulation"])

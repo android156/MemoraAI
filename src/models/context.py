@@ -75,7 +75,4 @@ class Context:
         """Строковое представление контекста"""
         return self.get_summary()
 
-    def clear(self):
-        """Очистка контекста"""
-        logger.debug("Очистка контекста")
-        self = Context()
+    
