@@ -165,5 +165,5 @@ def register_handlers(
     )
     # Регистрируем обработчик для всех остальных сообщений
     dp.message.register(
-        lambda message: handle_message(message, context_manager, content_generator)
+        lambda message: asyncio.create_task(handle_message(message, context_manager, content_generator))
     )
