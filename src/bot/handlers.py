@@ -105,18 +105,23 @@ def register_handlers(dp: Dispatcher, context_manager: ContextManager, content_g
     """Регистрация обработчиков команд бота"""
     logger.info("Регистрация обработчиков команд бота")
 
-    # Регистрация команд с фильтрами для текста кнопок
-    dp.message.register(start_command, Command(commands=["start"]))
-    dp.message.register(start_command, F.text == "🔄 Перезагрузить бота")
-
+    # Регистрация команды help и кнопки помощи
     dp.message.register(help_command, Command(commands=["help"]))
     dp.message.register(help_command, F.text == "❓ Помощь")
 
-    dp.message.register(
-        lambda message: clear_command(message, context_manager),
-        F.text == "🗑 Очистить контекст"
-    )
+    # Регистрация команды start и кнопки перезагрузки
+    dp.message.register(start_command, Command(commands=["start"]))
+    dp.message.register(start_command, F.text == "🔄 Перезагрузить")
 
+    # Создаем асинхронную функцию для очистки контекста
+    async def clear_handler(message: types.Message):
+        await clear_command(message, context_manager)
+
+    # Регистрация команды clear и кнопки очистки
+    dp.message.register(clear_handler, Command(commands=["clear"]))
+    dp.message.register(clear_handler, F.text == "❌ Очистить контекст")
+
+    # Регистрация генерации поздравления
     dp.message.register(
         lambda message: generate_congratulation(message, context_manager, content_generator),
         F.text == "✨ Создать поздравление"
