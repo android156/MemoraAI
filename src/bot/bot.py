@@ -49,21 +49,8 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
 
     # Регистрация обработчиков
     try:
-        # Регистрация обычных команд без middleware
-        dp.message.register(start_command, Command(commands=["/start"]))
-        dp.message.register(help_command, Command(commands=["/help"]))
-        dp.message.register(clear_command, Command(commands=["/clear"]))
-        dp.message.register(
-            lambda msg, context_manager=context_manager, content_generator=content_generator: 
-            generate_congratulation(msg, context_manager, content_generator),
-            Command(commands=["/congratulation"])
-        )
-
-        # Регистрация обработчика сообщений
-        @dp.message(lambda msg: not msg.text.startswith('/'))
-        async def message_handler(message: Message, context_manager=context_manager, content_generator=content_generator):
-            return await handle_message(message, context_manager, content_generator)
-
+        # Регистрация всех обработчиков через handlers.py
+        register_handlers(dp, context_manager, content_generator)
         logger.debug("Обработчики команд зарегистрированы")
     except Exception as e:
         logger.error(f"Ошибка при регистрации обработчиков: {str(e)}", exc_info=True)
