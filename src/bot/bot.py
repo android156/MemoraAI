@@ -9,7 +9,7 @@ from aiogram.types import BotCommand, Message
 from aiogram.filters import Command
 from aiogram.client.session.base import BaseSession
 from config import Config
-from bot.handlers import handle_message, start_command, help_command, clear_command
+from bot.handlers import register_handlers
 from services.ai_service import AIService
 from services.context_manager import ContextManager
 from services.content_generator import ContentGenerator
