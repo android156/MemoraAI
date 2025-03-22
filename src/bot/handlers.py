@@ -55,10 +55,13 @@ async def generate_congratulation(
         await message.answer("Генерирую поздравление...")
         greeting = await content_generator.generate_content(context)
 
+        greeting_text, image_url = greeting
         await message.answer(
-            greeting,
+            greeting_text,
             reply_markup=get_main_keyboard()
         )
+        if image_url:
+            await message.answer_photo(image_url)
         logger.info(f"Поздравление успешно отправлено пользователю {user_id}")
 
     except Exception as e:
