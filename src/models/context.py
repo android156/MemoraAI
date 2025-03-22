@@ -30,6 +30,18 @@ class Context:
         logger.debug(f"Добавление сообщения в контекст: {message[:50]}...")
         self.messages.append(message)
 
+    def update_values(self, items):
+        """
+        Обновление значений атрибутов объекта
+        
+        Args:
+            items (iterable): Пары (ключ, значение) для обновления атрибутов.
+        """
+        for key, value in items:
+            setattr(self, key, value)
+        
+    
+
     def get_summary(self) -> str:
         """
         Формирование резюме контекста

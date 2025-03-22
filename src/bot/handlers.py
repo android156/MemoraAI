@@ -53,7 +53,7 @@ async def generate_congratulation(
             return
 
         await message.answer("Генерирую поздравление...")
-        greeting = await content_generator.generate_congratulation(context)
+        greeting = await content_generator.generate_content(context)
 
         await message.answer(
             greeting,
@@ -88,9 +88,9 @@ async def handle_message(
         user_id = message.from_user.id
 
         # Сохраняем сообщение в контекст
-        await context_manager.update_context(user_id, message_text)
+        context = await context_manager.update_context(user_id, message_text)
         await message.answer(
-            "Я запомнил эту информацию. Что-нибудь ещё?",
+            f"Я запомнил эту информацию. Что-нибудь ещё?\n{context.get_summary()}", 
             reply_markup=get_main_keyboard()
         )
 

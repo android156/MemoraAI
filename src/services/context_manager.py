@@ -50,6 +50,11 @@ class ContextManager:
         try:
             analyzed_data = await self.ai_service.analyze_context(message, context)
             logger.debug(f"Результат анализа контекста: {analyzed_data}")
+            
+            
+            # Обновление контекста с анализом
+            context.update_values(analyzed_data.items())
+            
 
             # Добавление исходного сообщения в историю
             context.add_message(message)
