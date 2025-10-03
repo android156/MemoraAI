@@ -36,10 +36,7 @@ class AIService:
             
             # Создание HTTP-клиента с прокси
             http_client = httpx.Client(
-                proxies={
-                    "http://": proxy_url,
-                    "https://": proxy_url
-                }
+                proxy=proxy_url
             )
             self.client = OpenAI(api_key=api_key, http_client=http_client)
         else:
