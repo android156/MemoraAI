@@ -38,7 +38,14 @@ async def create_bot(config: Config) -> tuple[Bot, Dispatcher]:
     # Инициализация сервисов
     try:
         logger.info("Инициализация сервисов")
-        ai_service = AIService(config.openai_api_key)
+        ai_service = AIService(
+            api_key=config.openai_api_key,
+            proxy_enabled=config.openai_proxy_enabled,
+            proxy_host=config.openai_proxy_host,
+            proxy_port=config.openai_proxy_port,
+            proxy_username=config.openai_proxy_username,
+            proxy_password=config.openai_proxy_password
+        )
         context_manager = ContextManager(ai_service)
         content_generator = ContentGenerator(ai_service)
         logger.debug("Сервисы успешно инициализированы")

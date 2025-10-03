@@ -3,6 +3,7 @@
 """
 import json
 import logging
+import httpx
 from openai import OpenAI, OpenAIError
 from models.context import Context
 
@@ -11,10 +12,39 @@ logger = logging.getLogger(__name__)
 class AIService:
     """Класс для работы с OpenAI API"""
 
-    def __init__(self, api_key: str):
-        """Инициализация клиента OpenAI"""
+    def __init__(
+        self, 
+        api_key: str,
+        proxy_enabled: bool = False,
+        proxy_host: str | None = None,
+        proxy_port: int | None = None,
+        proxy_username: str | None = None,
+        proxy_password: str | None = None
+    ):
+        """Инициализация клиента OpenAI с поддержкой HTTPS-прокси"""
         logger.info("Инициализация AIService")
-        self.client = OpenAI(api_key=api_key)
+        
+        # Настройка прокси, если включен
+        if proxy_enabled and proxy_host and proxy_port:
+            # Формирование URL прокси с авторизацией
+            if proxy_username and proxy_password:
+                proxy_url = f"https://{proxy_username}:{proxy_password}@{proxy_host}:{proxy_port}"
+                logger.info(f"OpenAI подключение через HTTPS прокси: {proxy_host}:{proxy_port} (с авторизацией)")
+            else:
+                proxy_url = f"https://{proxy_host}:{proxy_port}"
+                logger.info(f"OpenAI подключение через HTTPS прокси: {proxy_host}:{proxy_port}")
+            
+            # Создание HTTP-клиента с прокси
+            http_client = httpx.Client(
+                proxies={
+                    "http://": proxy_url,
+                    "https://": proxy_url
+                }
+            )
+            self.client = OpenAI(api_key=api_key, http_client=http_client)
+        else:
+            logger.info("OpenAI подключение напрямую (без прокси)")
+            self.client = OpenAI(api_key=api_key)
 
     async def analyze_context(self, text: str, prev_context=None) -> str:
         """
