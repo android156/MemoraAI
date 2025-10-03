@@ -5,6 +5,11 @@ import os
 from dataclasses import dataclass
 from dotenv import load_dotenv
 
+# Константы для настроек прокси (несекретные данные)
+DEFAULT_PROXY_ENABLED = False  # Включить/выключить прокси
+DEFAULT_PROXY_HOST = None      # Адрес прокси-сервера (например, "proxy.example.com")
+DEFAULT_PROXY_PORT = None      # Порт прокси-сервера (например, 8080)
+
 @dataclass
 class Config:
     """Класс конфигурации приложения"""
@@ -31,9 +36,13 @@ def load_config() -> Config:
         raise ValueError("OPENAI_API_KEY не найден в переменных окружения")
     
     # Загрузка параметров прокси
-    proxy_enabled = os.getenv("OPENAI_PROXY_ENABLED", "false").lower() == "true"
-    proxy_host = os.getenv("OPENAI_PROXY_HOST")
-    proxy_port = int(os.getenv("OPENAI_PROXY_PORT")) if os.getenv("OPENAI_PROXY_PORT") else None
+    # Используем константы по умолчанию для несекретных настроек
+    proxy_enabled_str = os.getenv("OPENAI_PROXY_ENABLED", str(DEFAULT_PROXY_ENABLED)).lower()
+    proxy_enabled = proxy_enabled_str == "true"
+    proxy_host = os.getenv("OPENAI_PROXY_HOST", DEFAULT_PROXY_HOST)
+    proxy_port = int(os.getenv("OPENAI_PROXY_PORT")) if os.getenv("OPENAI_PROXY_PORT") else DEFAULT_PROXY_PORT
+    
+    # Секретные данные загружаются только из переменных окружения
     proxy_username = os.getenv("OPENAI_PROXY_USERNAME")
     proxy_password = os.getenv("OPENAI_PROXY_PASSWORD")
     
