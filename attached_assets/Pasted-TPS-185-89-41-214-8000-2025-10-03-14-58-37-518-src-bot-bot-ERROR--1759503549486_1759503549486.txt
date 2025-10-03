@@ -1,0 +1,45 @@
+TPS прокси: 185.89.41.214:8000 (с авторизацией)
+2025-10-03 14:58:37,518 - src.bot.bot - ERROR - Ошибка при инициализации сервисов: Client.__init__() got an unexpected keyword argument 'proxies'
+Traceback (most recent call last):
+  File "/home/runner/workspace/src/bot/bot.py", line 41, in create_bot
+    ai_service = AIService(
+                 ^^^^^^^^^^
+  File "/home/runner/workspace/src/services/ai_service.py", line 38, in __init__
+    http_client = httpx.Client(
+                  ^^^^^^^^^^^^^
+TypeError: Client.__init__() got an unexpected keyword argument 'proxies'
+2025-10-03 14:58:37,519 - __main__ - ERROR - Критическая ошибка при запуске бота: Client.__init__() got an unexpected keyword argument 'proxies'
+Traceback (most recent call last):
+  File "/home/runner/workspace/src/main.py", line 41, in main
+    bot, dp = await create_bot(config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/src/bot/bot.py", line 41, in create_bot
+    ai_service = AIService(
+                 ^^^^^^^^^^
+  File "/home/runner/workspace/src/services/ai_service.py", line 38, in __init__
+    http_client = httpx.Client(
+                  ^^^^^^^^^^^^^
+TypeError: Client.__init__() got an unexpected keyword argument 'proxies'
+2025-10-03 14:58:37,520 - __main__ - CRITICAL - Неожиданная ошибка: Client.__init__() got an unexpected keyword argument 'proxies'
+Traceback (most recent call last):
+  File "/home/runner/workspace/src/main.py", line 58, in <module>
+    asyncio.run(main())
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/src/main.py", line 41, in main
+    bot, dp = await create_bot(config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/src/bot/bot.py", line 41, in create_bot
+    ai_service = AIService(
+                 ^^^^^^^^^^
+  File "/home/runner/workspace/src/services/ai_service.py", line 38, in __init__
+    http_client = httpx.Client(
+                  ^^^^^^^^^^^^^
+TypeError: Client.__init__() got an unexpected keyword argument 'proxies'
