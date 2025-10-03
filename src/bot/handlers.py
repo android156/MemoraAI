@@ -56,14 +56,14 @@ async def generate_congratulation(
         greeting = await content_generator.generate_content(context)
 
         greeting_text, image_url = greeting
-        await message.answer(
-            greeting_text,
-            reply_markup=get_main_keyboard()
-        )
         if image_url:
-            await message.answer_photo(image_url)
+            await message.answer_photo(image_url, caption=greeting_text[:1024])
+        else:
+            await message.answer(
+                greeting_text,
+                reply_markup=get_main_keyboard()
+            )
         logger.info(f"Поздравление успешно отправлено пользователю {user_id}")
-
     except Exception as e:
         logger.error(f"Ошибка при генерации поздравления: {str(e)}", exc_info=True)
         await message.answer(
@@ -93,7 +93,7 @@ async def handle_message(
         # Сохраняем сообщение в контекст
         context = await context_manager.update_context(user_id, message_text)
         await message.answer(
-            f"Я запомнил эту информацию. Что-нибудь ещё?\n{context.get_summary()}", 
+            f"{context.get_summory()}\nЧто-нибудь ещё?", 
             reply_markup=get_main_keyboard()
         )
 

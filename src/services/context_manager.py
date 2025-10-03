@@ -53,7 +53,7 @@ class ContextManager:
             
             
             # Обновление контекста с анализом
-            context.update_values(analyzed_data.items())
+            context.update_summory(analyzed_data)
             
 
             # Добавление исходного сообщения в историю

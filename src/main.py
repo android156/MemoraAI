@@ -22,6 +22,7 @@ logging.basicConfig(
 logging.getLogger('httpcore.http11').setLevel(logging.INFO)
 logging.getLogger('httpcore.connection').setLevel(logging.INFO)
 logging.getLogger('openai._base_client').setLevel(logging.INFO)
+logging.getLogger('models.context').setLevel(logging.INFO)
 
 logger = logging.getLogger(__name__)
 

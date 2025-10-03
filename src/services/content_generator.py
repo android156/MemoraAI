@@ -22,6 +22,6 @@ class ContentGenerator:
         greeting_text = await self.ai_service.generate_greeting(context)
 
         # Генерация изображения
-        image_url = await self.ai_service.generate_image(context)
+        image_url = await self.ai_service.generate_image(greeting_text)
 
         return greeting_text, image_url
